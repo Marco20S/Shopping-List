@@ -1,12 +1,13 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { Avatar, Button, Card, IconButton, TextInput } from 'react-native-paper';
 import { Entypo } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
 export default function Home() {
 
-    const [name, setName] = useState('')
+    const [item, setItem] = useState('')
     const [quantity, setQuantity] = useState('')
 
 
@@ -26,7 +27,7 @@ export default function Home() {
 
                 <TextInput label="Item Name" mode="outlined"
                     activeOutlineColor='#f5bc98' outlineColor='#f5bc98'
-                    value={name} onChange={(text) => setName(text)} />
+                    value={item} onChange={(text) => setItem(text)} />
 
                 <TextInput label="Quantity" mode="outlined" outlineColor='#f5bc98' text
                     activeOutlineColor='#f5bc98' value={quantity}
@@ -40,14 +41,146 @@ export default function Home() {
                 </Button>
 
                 <Text></Text>
-                <ScrollView style={{ borderColor: 'black', borderWidth: 1 }}>
-                    <Card.Title
-                        title="Card Title"
-                        subtitle="Card Subtitle"
-                        left={(props) => <Avatar.Icon {...props} icon="folder" />}
-                        right={(props) => <IconButton {...props} icon="dots-vertical" onPress={() => { }} />}
-                    />
-                </ScrollView>
+                 <Text></Text>
+             <ScrollView style={styles.innerContainer}>   
+                <View >
+                    {/* <Text>Your items</Text> */}
+                    
+
+                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 0, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
+
+                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
+
+                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
+                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
+                            
+                        </View>
+
+                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
+
+                            <TouchableOpacity marginLeft={20}>
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                            <TouchableOpacity marginLeft={20} >
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                        </View>
+
+                    </Card>
+                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 1, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
+
+                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
+
+                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
+                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
+                            
+                        </View>
+
+                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
+
+                            <TouchableOpacity marginLeft={20}>
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                            <TouchableOpacity marginLeft={20} >
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                        </View>
+
+                    </Card>
+                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 0, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
+
+                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
+
+                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
+                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
+                            
+                        </View>
+
+                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
+
+                            <TouchableOpacity marginLeft={20}>
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                            <TouchableOpacity marginLeft={20} >
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                        </View>
+
+                    </Card>
+                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 1, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
+
+                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
+
+                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
+                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
+                            
+                        </View>
+
+                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
+
+                            <TouchableOpacity marginLeft={20}>
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                            <TouchableOpacity marginLeft={20} >
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                        </View>
+
+                    </Card>
+                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 0, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
+
+                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
+
+                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
+                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
+                            
+                        </View>
+
+                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
+
+                            <TouchableOpacity marginLeft={20}>
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                            <TouchableOpacity marginLeft={20} >
+                                {/* onPress={() => removeFromCart(item.id)} */}
+                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
+
+                            </TouchableOpacity>
+
+                        </View>
+
+                    </Card>
+
+               
+            </View> 
+            </ScrollView>
             </View>
         </View>
     )
@@ -85,6 +218,7 @@ const styles = StyleSheet.create({
         // alignItems: 'center',
         // justifyContent: 'center',
         width: '100%',
+        height: '100%',
         // height:200
         paddingBottom: 10,
         padding: 10,
@@ -93,12 +227,12 @@ const styles = StyleSheet.create({
     },
 
     innerContainer: {
-        height: 350,
-        width: 320,
-        padding: 30,
-        // flex: 1,
+        height: 500,
+        width: "100%",
+        padding: 7,
+        flex: 0,
         borderRadius: 20,
-        // backgroundColor: 'white',
+        backgroundColor: 'blue',
         // alignItems: 'center',
         // justifyContent: 'center',
     },
