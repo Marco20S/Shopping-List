@@ -1,16 +1,178 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import { Avatar, Button, Card, IconButton, TextInput } from 'react-native-paper';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Avatar, Button, Card, IconButton, TextInput, Tooltip } from 'react-native-paper';
 import { Entypo } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import { database } from "../firebase/Config";
+import { getDocs, collection, addDoc, deleteDoc, doc, updateDoc, } from "firebase/firestore";
 
 
-export default function Home() {
+export default function Home(props) {
 
     const [item, setItem] = useState('')
     const [quantity, setQuantity] = useState('')
+    const [id, setID] = useState('')
+
+    const [show, setShow] = useState(false)
+
+    const [shoppingList, setShoppingList] = useState([])
+
+    const shopingCollection = collection(database, "List");
+
+    useEffect(() => {
+        getShopingItems()
+    }, [])
+
+    const mapDispatch = (dispatch) => {
+        return {
+            addItem: (itemData) => dispatch(addItemAction(itemData)),
+            deletItem: (id) => dispatch(deleteItemAction(id)),
+            updateItem: (id, updatedItem) => dispatch(updateItemAction(id, updatedItem)),
+        }
+    };
+
+    const addItem = async () => {
+        // console.log(quantity);
+
+        try {
+            await addDoc(shopingCollection, {
+                // Make sure "item" is a valid value, not a SyntheticEvent object
+                Item: item,
+                Quantity: quantity,
+                // Category: itemCategory,
+                // Price: itemPrice,
+            });
+
+            // Dispatch Redux action to add the item to the shopping list
+            props.addItem({
+                Item: item,
+                Quantity: quantity,
+                // Category: itemCategory,
+                // Price: itemPrice,
+            });
+
+            setItem("");
+            setQuantity("");
+            // setItemCategory("");
+            // setItemPrice(0);
+
+            Alert.alert("Item has been added");
+        } catch (error) {
+            console.error("Error adding items to Firebase", error);
+            Alert.alert("Item was not added");
+        }
+    };
+
+    const deletItem = async (id) => {
+        const shopItem = doc(database, "List", id);
+        await deleteDoc(shopItem);
+        Alert.alert("This item was deleted")
+
+        //dispatch
+        props.deletItem(id);
+        // deletItem(id);
+    };
 
 
+    const editItem = async (id, item, quantity) => {
+        setItem(item)
+        setQuantity(quantity)
+        setID(id)
+        setShow(true)
+
+        const shopItem = doc(database, "List", id);
+        await updateDoc(shopItem, { Item: updatedItem });
+
+        //dispatch
+        props.updateItem(id, updatedItem);
+        // updateItem(id, updatedItem);
+    };
+
+    const updateItem = async () => {
+        // setItem(item)
+        // setQuantity(quantity)
+        // setID(id)
+
+        const shopItem = doc(database, "List", id);
+        // await updateDoc(shopItem, { Item: updatedItem });
+        await updateDoc(shopItem, { Item: item, Quantity: quantity });
+        Alert.alert("Item was updated")
+        setShow(false)
+
+        //dispatch
+        props.updateItem(id, updatedItem);
+        // updateItem(id, updatedItem);
+    };
+
+    const getShopingItems = async () => {
+
+        //get data from database 
+        try {
+            const data = await getDocs(shopingCollection);
+
+            const filtereddata = data.docs.map((doc) => ({
+
+                //this fucntion  returns the values in the collection
+                ...doc.data(),
+                id: doc.id,
+
+            }));
+
+            setShoppingList(filtereddata);
+            // setShoppingList(data);
+
+            console.log(filtereddata);
+        } catch (error) {
+            console.error("Error fetching collection", error);
+        }
+    };
+
+
+    function addedCard() {
+
+        return shoppingList.map((item) => {
+
+            return (
+
+                <Card height={100} contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 7, borderWidth: 1, borderColor: '#98D2F5', backgroundColor: "#f5bc98" }}>
+
+                    <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
+
+                        <Text style={{ fontSize: 15, paddingBottom: 10, fontWeight: "500" }}> Item : {item.Item} </Text>
+                        <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity : {item.Quantity} </Text>
+
+                    </View>
+
+                    <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
+
+                        <Tooltip title="Edit">
+                            <TouchableOpacity marginLeft={20} onPress={() => editItem(item.id, item.Item, item.Quantity)}>
+                                {/* */}
+                                <Feather name="edit" size={24} color="white" />
+
+                            </TouchableOpacity>
+                        </Tooltip>
+
+
+                        <Tooltip title="Delete" >
+                            <TouchableOpacity marginLeft={20} onPress={() => deletItem(item.id)}>
+
+                                <AntDesign name="delete" size={24} color="white" />
+
+                            </TouchableOpacity>
+                        </Tooltip>
+
+
+                    </View>
+
+                </Card>
+
+            )
+        })
+
+    }
 
     return (
         <View style={styles.container}>
@@ -27,160 +189,37 @@ export default function Home() {
 
                 <TextInput label="Item Name" mode="outlined"
                     activeOutlineColor='#f5bc98' outlineColor='#f5bc98'
-                    value={item} onChange={(text) => setItem(text)} />
+                    value={item} onChangeText={(value) => setItem(value)} />
 
-                <TextInput label="Quantity" mode="outlined" outlineColor='#f5bc98' text
+                <TextInput label="Quantity" mode="outlined" outlineColor='#f5bc98'
                     activeOutlineColor='#f5bc98' value={quantity}
-                    onChange={(value) => setQuantity(value)} />
+                    onChangeText={(value) => setQuantity(value)} />
 
                 <Text></Text>
 
-                <Button mode="contained-tonal" buttonColor='#f5bc98' textColor='black'
-                    onPress={() => console.log('Added')}>
-                    Add Item
-                </Button>
+                {!show ?
+
+                    <Button mode="contained-tonal" buttonColor='#f5bc98' textColor='white'
+                        onPress={() => addItem()}>
+                        Add Item
+                    </Button>
+                    :
+                    <Button mode="contained-tonal" buttonColor='#f5bc98' textColor='white'
+                        onPress={() => updateItem()}>
+                        Update Item
+                    </Button>
+                }
 
                 <Text></Text>
-                 <Text></Text>
-             <ScrollView style={styles.innerContainer}>   
-                <View >
-                    {/* <Text>Your items</Text> */}
-                    
+                <Text></Text>
+                <ScrollView style={styles.innerContainer}>
+                    <View >
+                        {/* <Text>Your items</Text> */}
 
-                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 0, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
+                        {addedCard()}
 
-                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
-
-                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
-                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
-                            
-                        </View>
-
-                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
-
-                            <TouchableOpacity marginLeft={20}>
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                            <TouchableOpacity marginLeft={20} >
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                        </View>
-
-                    </Card>
-                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 1, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
-
-                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
-
-                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
-                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
-                            
-                        </View>
-
-                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
-
-                            <TouchableOpacity marginLeft={20}>
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                            <TouchableOpacity marginLeft={20} >
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                        </View>
-
-                    </Card>
-                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 0, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
-
-                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
-
-                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
-                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
-                            
-                        </View>
-
-                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
-
-                            <TouchableOpacity marginLeft={20}>
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                            <TouchableOpacity marginLeft={20} >
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                        </View>
-
-                    </Card>
-                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 1, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
-
-                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
-
-                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
-                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
-                            
-                        </View>
-
-                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
-
-                            <TouchableOpacity marginLeft={20}>
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                            <TouchableOpacity marginLeft={20} >
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                        </View>
-
-                    </Card>
-                    <Card height={100}  contentStyle={{ alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row' }} style={{ padding: 20, marginBottom: 5, borderWidth: 0, borderColor: 'gray' , backgroundColor:"#f5bc98"}}> 
-
-                        <View style={{ flex: 1, width: "40%" }} justifyContent='flex-start' padding={5} >
-
-                            <Text style={{ fontSize: 14, paddingBottom: 10 }} > Item  </Text>
-                            <Text style={{ fontSize: 12, paddingBottom: 10 }}> Quantity  </Text>
-                            
-                        </View>
-
-                        <View marginLeft={0} width={'0%'} style={{ flex: 0.3, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', borderRadius: 10 }} >
-
-                            <TouchableOpacity marginLeft={20}>
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="note-edit" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                            <TouchableOpacity marginLeft={20} >
-                                {/* onPress={() => removeFromCart(item.id)} */}
-                                <MaterialCommunityIcons name="delete-empty" size={24} color="black" />
-
-                            </TouchableOpacity>
-
-                        </View>
-
-                    </Card>
-
-               
-            </View> 
-            </ScrollView>
+                    </View>
+                </ScrollView>
             </View>
         </View>
     )
@@ -218,8 +257,8 @@ const styles = StyleSheet.create({
         // alignItems: 'center',
         // justifyContent: 'center',
         width: '100%',
-        height: '100%',
-        // height:200
+        // height: '100%',
+        height: 650,
         paddingBottom: 10,
         padding: 10,
 
@@ -227,12 +266,12 @@ const styles = StyleSheet.create({
     },
 
     innerContainer: {
-        height: 500,
+        height: 0,
         width: "100%",
-        padding: 7,
+        padding: 6,
         flex: 0,
         borderRadius: 20,
-        backgroundColor: 'blue',
+        // backgroundColor: 'blue',
         // alignItems: 'center',
         // justifyContent: 'center',
     },
