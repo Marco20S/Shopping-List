@@ -69,6 +69,7 @@ export default function Home(props) {
         const shopItem = doc(database, "List", id);
         await deleteDoc(shopItem);
         Alert.alert("This item was deleted")
+        getShopingItems()
 
         //dispatch
         props.deletItem(id);
@@ -99,6 +100,7 @@ export default function Home(props) {
         // await updateDoc(shopItem, { Item: updatedItem });
         await updateDoc(shopItem, { Item: item, Quantity: quantity });
         Alert.alert("Item was updated")
+        getShopingItems()
         setShow(false)
 
         //dispatch
